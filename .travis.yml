@@ -1,7 +1,33 @@
-language: c
+language: cpp
+sudo: true
+dist: trusty
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-6
+      - gcc-6
+  homebrew:
+    taps:
+      - facebook/fb
+    packages:
+      - buck
+
+os:
+  - linux
+  - osx
+
+env:
+  - BUCKAROO_VERSION=buckaroo-redux-alpha-12
+
+osx_image: xcode9.3
+
+before_install:
+  - ./travis/before-install-$TRAVIS_OS_NAME.sh
+
 script:
-    - cd tests
-    - make tests
-branches:
-    only:
-        - master
+  - ./buckaroo-client install
+  - buck build -c ui.superconsole=DISABLED //:cranium
+  - buck run -c ui.superconsole=DISABLED //:optimizer_test
